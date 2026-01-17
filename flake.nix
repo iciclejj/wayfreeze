@@ -3,17 +3,14 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    systems.url = "github:nix-systems/default";
   };
 
   outputs =
-    { nixpkgs, ... }:
+    { nixpkgs, systems, ... }:
     let
       forAllSystems =
-        function:
-        nixpkgs.lib.genAttrs [
-          "x86_64-linux"
-          "aarch64-linux"
-        ] (system: function nixpkgs.legacyPackages.${system});
+        function: nixpkgs.lib.genAttrs (import systems) (system: function nixpkgs.legacyPackages.${system});
     in
     {
       devShells = forAllSystems (pkgs: {
